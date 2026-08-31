@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ar" dir="rtl" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f5f0">
+<meta name="description" content="KOSIF Audit Pro — مراجعة وتحليل مالي بعشر جولات محكومة، مجلس مراجعين، وربط حيّ بالمعايير وتحديثاتها.">
+<title>KOSIF Audit Pro · المراجعة والتحليل المالي</title>
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;500;700;800&display=swap"></noscript>
+<link rel="stylesheet" href="./web/styles/app.css">
+</head>
+<body>
+
+<a class="skip" href="#view">تخطّي إلى المحتوى</a>
+
+<div class="app">
+  <aside class="rail">
+    <a class="brand" href="#/">
+      <span class="brand-mark" aria-hidden="true">K</span>
+      <span><b>KOSIF Audit Pro</b><small>مراجعة · تحليل · معايير</small></span>
+    </a>
+
+    <div class="next" id="next-card" aria-live="polite"></div>
+
+    <div class="progress-wrap">
+      <div class="progress-head"><span>تقدّم البرنامج</span><b class="num" id="progress-pct">0%</b></div>
+      <div class="track track-main"><i data-w="0"></i></div>
+      <span class="muted" style="font-size:.75rem"><span class="num" id="progress-text"></span> بوابة مفتوحة</span>
+    </div>
+
+    <nav class="nav" aria-label="أقسام التطبيق"></nav>
+
+    <div class="rail-foot">
+      <div class="rail-actions">
+        <button class="btn btn-ghost btn-sm" data-act="theme"><span id="theme-label">الوضع الليلي</span></button>
+        <button class="btn btn-ghost btn-sm" data-act="demo">ارتباط تجريبي</button>
+        <button class="btn btn-ghost btn-sm" data-act="reset">ارتباط جديد</button>
+      </div>
+      <p>الأرقام من محرّك حتمي. الذكاء الاصطناعي يصوغ ولا يحسب ولا يقرر.</p>
+    </div>
+  </aside>
+
+  <main id="view" tabindex="-1"></main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<noscript>
+  <div style="max-width:620px;margin:56px auto;padding:22px;border:1px solid #ded8cc;border-radius:14px">
+    <h2>يتطلّب التطبيق تشغيل JavaScript</h2>
+    <p>يعمل KOSIF Audit Pro بالكامل داخل متصفحك دون خادم — لا تُرفع بياناتك إلى أي مكان — ولذلك يحتاج إلى JavaScript.</p>
+  </div>
+</noscript>
+
+<script type="module" src="./web/js/app.js"></script>
+</body>
+</html>
