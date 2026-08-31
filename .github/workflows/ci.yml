@@ -1,19 +1,23 @@
-name: CI
+name: quality
 
 on:
+  pull_request:
   push:
     branches: [main]
-  pull_request:
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
-      - name: الاختبارات
-        run: npm test
-      - name: عقود اللون
-        run: npm run palette
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
