@@ -1,0 +1,213 @@
+/*
+ * KOSIF v17 — طبقة الطباعة والكثافة
+ * ======================================================================
+ * طبقة عرض بحتة فوق تمحيص v6 + تحسينات v16. لا تلمس سلوكًا ولا منطقًا
+ * ولا تخفي عنصرًا: كل ما هنا أحجام ومسافات وتدفّق. القدرات الحالية
+ * كلها باقية كما هي بحكم البناء، لا بحكم الوعد.
+ *
+ * ما تعالجه، بأرقام مقيسة على النسخة الحية قبل التعديل:
+ *
+ *   الزحام — كان الكروم (topbar 221px + tabs 54px) = 275px، أي ٢٧٪ من
+ *   شاشة 1100px قبل أول سطر محتوى، وفيه ٢١ زرًا. وشريط التبويبات كان
+ *   يفيض: 2080px من التبويبات داخل 1240px، أي ٨٤٠px مخفية خلف تمرير
+ *   أفقي بلا أي إشارة تدل عليه — وفي RTL يكون الفائض على اليسار حيث
+ *   لا تتوقعه العين.
+ *
+ *   الخطوط — ستة أحجام في المحتوى وحده: 12 و12.5 و13 و13.5 و14 و15.
+ *   خمسة منها متقاربة لدرجة أنها تُقرأ كعدم انضباط لا كتدرّج. وأكثرها
+ *   استعمالًا 13.5px، وهو صغير على العربية في نص متصل: العربية تحتاج
+ *   حجمًا أكبر من اللاتينية لنفس الوضوح لأن تمييز حروفها يعتمد على
+ *   النقاط وتفاصيل أدقّ.
+ * ====================================================================== */
+
+/* ── ١. سُلّم الطباعة ──────────────────────────────────────────────── */
+:root {
+  /* أربع درجات واضحة بدل ستة متقاربة. المقاسات مرفوعة للعربية. */
+  --k17-xs: 13px;    /* شارات، وسوم، تعليقات هامشية */
+  --k17-sm: 14px;    /* نص ثانوي، خلايا جداول */
+  --k17-base: 15.5px;/* النص المتصل — كان 13.5px */
+  --k17-lg: 17px;    /* h3 */
+  --k17-xl: 21px;    /* h2 */
+  --k17-2xl: 27px;   /* h1 */
+
+  /* العربية تحتاج تنفيسًا رأسيًا أكثر: الحركات والنقاط تحت وفوق السطر */
+  --k17-leading: 1.85;
+  --k17-leading-tight: 1.4;
+
+  /* إيقاع رأسي واحد يحكم كل المسافات */
+  --k17-1: 6px;
+  --k17-2: 12px;
+  --k17-3: 18px;
+  --k17-4: 26px;
+  --k17-5: 38px;
+}
+
+/* ── ٢. النص المتصل ───────────────────────────────────────────────── */
+/* التطبيق لا يستعمل <p> للنص، بل .bf و .hint و span داخل البطاقات —
+   لذلك تستهدف القواعد الأصناف الفعلية، لا وسوم HTML مفترضة. */
+
+main .bf {
+  font-size: var(--k17-base) !important;
+  line-height: var(--k17-leading) !important;
+}
+
+main .hint,
+main small,
+main .ref,
+main .round-meta {
+  font-size: var(--k17-sm) !important;
+  line-height: 1.65 !important;
+}
+
+/* عنوان البطاقة كان 14px والنص 12.5px — فرق سطحي لا يصنع تراتبًا.
+   العنوان الآن يعلو النص بدرجة كاملة. */
+main .ttl {
+  font-size: var(--k17-lg) !important;
+  line-height: 1.4 !important;
+  margin-block-end: var(--k17-1);
+}
+
+main p, main li {
+  font-size: var(--k17-base);
+  line-height: var(--k17-leading);
+}
+
+/* طول السطر: العين تفقد بداية السطر التالي بعد ~٧٥ محرفًا */
+main p, main .note, main .info { max-width: 78ch; }
+main table p { max-width: none; }
+
+main td, main th { font-size: var(--k17-sm) !important; line-height: 1.7 !important; }
+
+/* الأرقام: عرض ثابت للخانات لتصطف رأسيًا، وعزل اتجاهي حتى لا ينقلب
+   ترتيبها داخل نص عربي */
+main .num, main .amount,
+main td[align="left"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  unicode-bidi: isolate;
+}
+
+/* ── ٣. العناوين: تدرّج حقيقي بدل قفزة 15px ← 33px ─────────────── */
+main h1 { font-size: var(--k17-2xl); line-height: 1.25; }
+main h2 { font-size: var(--k17-xl); line-height: 1.3; margin-block-end: var(--k17-2); }
+main h3 { font-size: var(--k17-lg); line-height: 1.35; margin-block-end: var(--k17-1); }
+main h4 { font-size: var(--k17-base); line-height: 1.4; }
+
+/* العنوان يلتصق بما تحته لا بما فوقه — قاعدة القرب */
+main h2:not(:first-child) { margin-block-start: var(--k17-5); }
+main h3:not(:first-child) { margin-block-start: var(--k17-4); }
+
+/* ── ٤. الكروم: من 275px إلى ما دون 170px ────────────────────────── */
+/* الشريط العلوي كان يأخذ 221px بثلاث صفوف من الشارات. */
+header.topbar { padding-block: 9px !important; }
+header.topbar .topbar-inner { gap: 9px !important; row-gap: 7px !important; }
+
+header.topbar .brand { gap: var(--k17-1) !important; }
+header.topbar .brand-name { font-size: var(--k17-xl); line-height: 1.1; }
+header.topbar .brand-sub { font-size: var(--k17-xs); line-height: 1.3; opacity: .78; }
+
+/* الشارات العلوية: أصغر وأكثر تقاربًا — هي أدوات لا محتوى */
+header.topbar .top-status { gap: 5px !important; row-gap: 5px !important; }
+header.topbar .kosif-company-switch { padding-block: 6px !important; }
+header.topbar .top-status > * { font-size: var(--k17-xs) !important; }
+header.topbar button,
+header.topbar .pill { padding-block: 4px !important; padding-inline: 10px !important; line-height: 1.45; }
+
+/* ── ٥. شريط التبويبات: لا تخفِ ٨٤٠px خلف تمرير صامت ────────────── */
+/* على الشاشات الواسعة: التفاف إلى سطرين، فتظهر التبويبات الثلاثة عشر
+   كلها. التبويب أداة تنقّل رئيسية — إخفاء نصفها يجعل نصف التطبيق
+   غير مكتشَف. */
+@media (min-width: 900px) {
+  nav.tabs .tabs-inner {
+    flex-wrap: wrap !important;
+    overflow-x: visible !important;
+    row-gap: var(--k17-1) !important;
+    justify-content: flex-start;
+  }
+}
+
+/* على الشاشات الضيقة يبقى التمرير، لكن بإشارة مرئية تدل عليه:
+   تلاشٍ عند الحافة التي يستمر خلفها المحتوى (اليسار في RTL). */
+@media (max-width: 899px) {
+  nav.tabs { position: relative; }
+  nav.tabs::after {
+    content: ""; position: absolute; inset-block: 0; inset-inline-start: 0;
+    width: 44px; pointer-events: none; z-index: 2;
+    background: linear-gradient(to left, transparent, var(--k17-fade, rgba(255,255,255,.92)));
+  }
+  nav.tabs .tabs-inner {
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 12px;
+    -webkit-overflow-scrolling: touch;
+  }
+  nav.tabs .tabs-inner > * { scroll-snap-align: start; }
+}
+
+nav.tabs .tabs-inner { gap: var(--k17-1) !important; }
+nav.tabs .tabs-inner > button {
+  font-size: var(--k17-sm) !important;
+  padding-block: 7px !important;
+  padding-inline: 13px !important;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+/* ── ٦. تنفيس المحتوى ────────────────────────────────────────────── */
+/* البطاقات كانت أربعة أعمدة بعرض 279px، فصار عرض النص 247px — أي نحو
+   ٣٣ محرفًا عربيًا في السطر. سطر بهذا القِصر يقطع الجملة كل ثلاث كلمات
+   ويجعل القراءة قفزًا لا انسيابًا. الأعمدة الآن تتكيّف بحد أدنى يضمن
+   طول سطر مقروءًا، فتصير ثلاثة على الشاشة الواسعة واثنين على المتوسطة. */
+/* البطاقات أربع، فأي عدد أعمدة غير ٢ أو ٤ يترك بطاقة يتيمة وفراغًا
+   كبيرًا بجانبها. والصنف اسمه .g2 أصلًا — أي أن عمودين هما نية التصميم
+   قبل أن يُتجاوز إلى أربعة. عمودان يعطيان طول سطر مريحًا وشبكة متزنة. */
+main .grid.g2:has(> .std-card) {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: var(--k17-3) !important;
+}
+@media (max-width: 860px) {
+  main .grid.g2:has(> .std-card) { grid-template-columns: 1fr !important; }
+}
+main .grid { gap: var(--k17-3) !important; }
+
+main .card,
+main .std-card { padding: var(--k17-4) !important; }
+main .card-h { margin-block-end: var(--k17-3) !important; }
+
+main section + section,
+main .card + .card { margin-block-start: var(--k17-4); }
+
+main .field { margin-block-end: var(--k17-3); }
+main .field label { font-size: var(--k17-sm); line-height: 1.5; }
+main .field input,
+main .field select,
+main .field textarea { font-size: var(--k17-base); padding-block: 9px; line-height: 1.6; }
+
+/* الجداول تتنفّس: الصف المالي يُقرأ بالمسح الرأسي، والحشو الضيق يعيقه */
+main table td { padding-block: 9px !important; }
+main table th { padding-block: 10px !important; }
+
+/* ── ٧. الوصولية ─────────────────────────────────────────────────── */
+/* هدف اللمس ٤٤px هو الحد الأدنى المعروف؛ الشارات الصغيرة تقصر عنه */
+@media (pointer: coarse) {
+  nav.tabs .tabs-inner > button { min-block-size: 42px; }
+  header.topbar button, header.topbar .pill { min-block-size: 38px; }
+}
+
+/* حالة تركيز واضحة لمن يتنقّل بلوحة المفاتيح */
+main :is(button, a, input, select, textarea):focus-visible,
+header.topbar :is(button, a, input):focus-visible,
+nav.tabs button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  nav.tabs .tabs-inner { scroll-behavior: auto; }
+}
+
+/* ── ٨. الطباعة الورقية ─────────────────────────────────────────── */
+@media print {
+  header.topbar, nav.tabs { display: none !important; }
+  main p, main li, main td { font-size: 11pt; line-height: 1.6; }
+  main .card, main .std-card { break-inside: avoid; }
+}
