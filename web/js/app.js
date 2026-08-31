@@ -75,10 +75,17 @@ function recompute() {
 }
 
 /* ── الرسم ─────────────────────────────────────────────────────── */
+/**
+ * المسار من الـ hash. أي hash ليس مسارًا (مثل #view الذي يضعه رابط
+ * التخطي) لا يُعد تنقّلًا: يبقى المستخدم في شاشته بدل أن يُقذف إلى
+ * اللوحة لأنه استعمل رابط الوصولية.
+ */
 function routeOf() {
   const hash = location.hash;
   if (hash.startsWith('#/rounds/')) { app.expandedRound = hash.split('/')[2]; return 'rounds'; }
-  return ROUTES[hash] ?? 'dashboard';
+  if (hash in ROUTES) return ROUTES[hash];
+  if (!hash.startsWith('#/')) return app.view ?? 'dashboard';
+  return 'dashboard';
 }
 
 function renderRail() {
@@ -138,7 +145,10 @@ function animate(scope) {
 }
 
 function navigate() {
-  app.view = routeOf();
+  const next = routeOf();
+  // hash غير تنقّلي (رابط التخطي) — لا نعيد الرسم ولا نفقد موضع القراءة
+  if (next === app.view && document.getElementById('view').childElementCount) return;
+  app.view = next;
   render();
   window.scrollTo({ top: 0 });
 }
