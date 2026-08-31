@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
@@ -95,7 +96,8 @@ function Navigation({
             key={item.id}
             type="button"
             variant={active ? "secondary" : "ghost"}
-            className="w-full justify-start"
+            className="nav-item w-full justify-start"
+            data-active={active}
             aria-current={active ? "page" : undefined}
             onClick={() => {
               onViewChange(item.id);
@@ -142,6 +144,7 @@ function StandardsContext({
             type="button"
             className="standard-switch"
             data-active={standard.code === selected.code}
+            aria-pressed={standard.code === selected.code}
             onClick={() => onStandardSelect(standard.code)}
           >
             <span dir="ltr">{standard.code}</span>
@@ -150,7 +153,11 @@ function StandardsContext({
         ))}
       </div>
 
-      <article className="standard-detail" aria-live="polite">
+      <article
+        key={selected.code}
+        className="standard-detail standard-detail-motion"
+        aria-live="polite"
+      >
         <div className="standard-code-row">
           <span className="standard-code" dir="ltr">
             {selected.code}
@@ -204,8 +211,22 @@ export function AppShell({
   dark,
   onThemeToggle,
 }: AppShellProps) {
+  const mainRef = useRef<HTMLElement>(null);
+  const previousView = useRef(view);
+
+  useEffect(() => {
+    if (previousView.current === view) return;
+    previousView.current = view;
+
+    const frame = window.requestAnimationFrame(() => {
+      mainRef.current?.focus({ preventScroll: true });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [view]);
+
   return (
-    <div className="kosif-app">
+    <div className="kosif-app" data-motion="cinematic">
       <a className="skip-link" href="#main-workspace">
         انتقل إلى مساحة العمل
       </a>
@@ -260,22 +281,36 @@ export function AppShell({
         </div>
 
         <div className="topbar-actions">
-          <Button type="button" variant="ghost" size="icon" aria-label="المساعدة">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="icon-action"
+            aria-label="المساعدة"
+          >
             <CircleHelp />
           </Button>
-          <Button type="button" variant="ghost" size="icon" aria-label="التنبيهات">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="icon-action"
+            aria-label="التنبيهات"
+          >
             <Bell />
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
+            className="theme-toggle"
+            data-theme={dark ? "dark" : "light"}
             aria-label={dark ? "تفعيل الوضع الفاتح" : "تفعيل الوضع الداكن"}
             onClick={onThemeToggle}
           >
             {dark ? <Sun /> : <Moon />}
           </Button>
-          <Button type="button" onClick={onImport}>
+          <Button type="button" className="import-cta" onClick={onImport}>
             <Upload data-icon="inline-start" />
             استيراد ميزان
           </Button>
@@ -321,8 +356,16 @@ export function AppShell({
           </div>
         </aside>
 
-        <main id="main-workspace" className="main-workspace" tabIndex={-1}>
-          {children}
+        <main
+          ref={mainRef}
+          id="main-workspace"
+          className="main-workspace"
+          data-view={view}
+          tabIndex={-1}
+        >
+          <div key={view} className="view-stage" data-view={view}>
+            {children}
+          </div>
         </main>
 
         <aside className="context-rail">
@@ -342,6 +385,7 @@ export function AppShell({
             <button
               key={item.id}
               type="button"
+              className="mobile-nav-item"
               data-active={active}
               aria-current={active ? "page" : undefined}
               onClick={() => onViewChange(item.id)}
@@ -389,4 +433,3 @@ export function AppShell({
     </div>
   );
 }
-

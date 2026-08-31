@@ -373,7 +373,10 @@ export function RequestsView({
                   data-state={request.id === selected.id ? "selected" : undefined}
                   onClick={() => onSelect(request)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") onSelect(request);
+                    if (event.key === "Enter" || event.key === " ") {
+                      if (event.key === " ") event.preventDefault();
+                      onSelect(request);
+                    }
                   }}
                 >
                   <TableCell>
@@ -393,7 +396,11 @@ export function RequestsView({
           </Table>
         </section>
 
-        <aside className="detail-panel" aria-labelledby="request-detail-title">
+        <aside
+          key={selected.id}
+          className="detail-panel detail-panel-motion"
+          aria-labelledby="request-detail-title"
+        >
           <div className="detail-panel-head">
             <div>
               <span dir="ltr">{selected.id}</span>

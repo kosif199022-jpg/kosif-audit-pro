@@ -43,3 +43,14 @@ test("الشاشة الصغيرة والحركة المخفضة والطباعة
   assert.match(reduced, /animation-duration:\s*0\.01ms/);
   assert.match(reduced, /transition-duration:\s*0\.01ms/);
 });
+
+test("التنقل الثابت على الهاتف يحترم dynamic viewport ومنطقة الأمان", () => {
+  const mobile = mediaSection(
+    "@media (max-width: 768px)",
+    "@supports (min-height: 100dvh)",
+  );
+  assert.match(mobile, /padding-block-end:\s*calc\(72px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(mobile, /min-height:\s*calc\(68px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(mobile, /inset-block-end:\s*calc\(80px \+ env\(safe-area-inset-bottom\)\)/);
+  assert.match(css, /min-height:\s*calc\(100dvh - 64px\)/);
+});
